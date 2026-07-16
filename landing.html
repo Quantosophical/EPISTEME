@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Episteme — Know What Your AI Actually Knows</title>
+    <meta name="description" content="Episteme is an epistemic workspace that makes AI uncertainty visible. See which claims are solid, which are guesses, and which are structurally dangerous — before you act on them.">
+    <meta name="keywords" content="AI uncertainty, epistemic analysis, AI transparency, hallucination detection, LLM reliability">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #141414;
+            --text-primary: #e8e6e3;
+            --text-secondary: #8a8a8a;
+            --text-dim: #555555;
+            --accent-cyan: #22d3ee;
+            --accent-amber: #f59e0b;
+            --zone-solid: #10b981;
+            --zone-gradient: #f59e0b;
+            --zone-fault: #ef4444;
+            --border-primary: #2a2a2a;
+            --border-accent: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* ═══════════════════════════════════════
+           Navigation
+           ═══════════════════════════════════════ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-logo span {
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.8rem !important;
+            color: var(--bg-primary) !important;
+            background: var(--accent-cyan) !important;
+            padding: 10px 24px !important;
+            border: 2px solid var(--accent-cyan) !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .nav-cta:hover {
+            background: transparent !important;
+            color: var(--accent-cyan) !important;
+            box-shadow: 3px 3px 0px var(--accent-cyan);
+        }
+
+        /* ═══════════════════════════════════════
+           Hero Section
+           ═══════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+        }
+
+        .hero-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            background: rgba(34, 211, 238, 0.08);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            padding: 8px 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 28px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero h1 .highlight {
+            color: var(--accent-cyan);
+            position: relative;
+        }
+
+        .hero h1 .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-cyan);
+            opacity: 0.4;
+        }
+
+        .hero-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            max-width: 640px;
+            line-height: 1.7;
+            margin-bottom: 48px;
+            font-weight: 300;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .btn-primary {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--bg-primary);
+            background: var(--accent-cyan);
+            border: 3px solid var(--accent-cyan);
+            padding: 16px 40px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--accent-cyan);
+            box-shadow: 4px 4px 0px var(--accent-cyan);
+            transform: translate(-2px, -2px);
+        }
+
+        .btn-secondary {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 2px solid var(--border-accent);
+            padding: 16px 40px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+            box-shadow: 3px 3px 0px var(--border-accent);
+            transform: translate(-2px, -2px);
+        }
+
+        /* Hero floating grid decoration */
+        .hero-grid {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+            opacity: 0.5;
+            animation: fadeInUp 1.4s ease-out;
+        }
+
+        .hero-grid .dot {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--border-accent);
+            animation: dotPulse 3s ease-in-out infinite;
+        }
+
+        .hero-grid .dot.active {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        .hero-grid .dot.warn {
+            background: var(--zone-gradient);
+            border-color: var(--zone-gradient);
+        }
+
+        .hero-grid .dot.fault {
+            background: var(--zone-fault);
+            border-color: var(--zone-fault);
+        }
+
+        /* ═══════════════════════════════════════
+           Problem Section
+           ═══════════════════════════════════════ */
+        .problem {
+            padding: 120px 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .problem-inner {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--zone-fault);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .problem h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+        }
+
+        .problem p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ═══════════════════════════════════════
+           Signals Section — H, G, C
+           ═══════════════════════════════════════ */
+        .signals {
+            padding: 100px 40px;
+        }
+
+        .signals-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .signals-header .section-label {
+            color: var(--accent-cyan);
+        }
+
+        .signals-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .signal-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .signal-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-primary);
+            padding: 40px 32px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .signal-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px var(--border-primary);
+        }
+
+        .signal-card .signal-icon {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .signal-card:nth-child(1) .signal-icon { color: var(--accent-cyan); }
+        .signal-card:nth-child(2) .signal-icon { color: var(--zone-gradient); }
+        .signal-card:nth-child(3) .signal-icon { color: var(--zone-solid); }
+
+        .signal-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .signal-card p {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .signal-card .formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-primary);
+            padding: 10px 16px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* ═══════════════════════════════════════
+           Zone Classification
+           ═══════════════════════════════════════ */
+        .zones {
+            padding: 100px 40px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .zones-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .zones-header .section-label {
+            color: var(--zone-gradient);
+        }
+
+        .zones-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .zone-row {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .zone-block {
+            flex: 1;
+            padding: 36px 28px;
+            border: 2px solid;
+            text-align: center;
+        }
+
+        .zone-block:first-child {
+            border-color: var(--zone-solid);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .zone-block:nth-child(2) {
+            border-color: var(--zone-gradient);
+            background: rgba(245, 158, 11, 0.05);
+            border-left: none;
+            border-right: none;
+        }
+
+        .zone-block:last-child {
+            border-color: var(--zone-fault);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .zone-block .zone-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .zone-block:first-child .zone-name { color: var(--zone-solid); }
+        .zone-block:nth-child(2) .zone-name { color: var(--zone-gradient); }
+        .zone-block:last-child .zone-name { color: var(--zone-fault); }
+
+        .zone-block .zone-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .zone-block .zone-threshold {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 12px;
+        }
+
+        /* ═══════════════════════════════════════
+           MAKS Memory Section
+           ═══════════════════════════════════════ */
+        .maks {
+            padding: 100px 40px;
+        }
+
+        .maks-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .maks-header .section-label {
+            color: var(--accent-amber);
+        }
+
+        .maks-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .maks-header p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 20px auto 0;
+            line-height: 1.7;
+        }
+
+        .maks-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .maks-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-primary);
+            padding: 36px 30px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .maks-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px var(--border-primary);
+        }
+
+        .maks-card .maks-icon {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .maks-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--accent-amber);
+        }
+
+        .maks-card p {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        .fidelity-flow {
+            max-width: 700px;
+            margin: 50px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .fidelity-stage {
+            text-align: center;
+            padding: 20px 24px;
+            border: 2px solid var(--border-primary);
+            flex: 1;
+        }
+
+        .fidelity-stage .stage-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .fidelity-stage .stage-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .fidelity-stage:nth-child(1) { border-color: var(--zone-solid); background: rgba(16, 185, 129, 0.05); }
+        .fidelity-stage:nth-child(1) .stage-name { color: var(--zone-solid); }
+        .fidelity-stage:nth-child(2) { border-color: var(--zone-gradient); background: rgba(245, 158, 11, 0.05); border-left: none; border-right: none; }
+        .fidelity-stage:nth-child(2) .stage-name { color: var(--zone-gradient); }
+        .fidelity-stage:nth-child(3) { border-color: var(--text-dim); background: rgba(85, 85, 85, 0.05); }
+        .fidelity-stage:nth-child(3) .stage-name { color: var(--text-dim); }
+
+        .fidelity-arrow {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            padding: 0 4px;
+        }
+
+        /* Two Engines Side-by-Side */
+        .engines {
+            padding: 100px 40px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .engines-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .engines-header .section-label {
+            color: var(--text-secondary);
+        }
+
+        .engines-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .engine-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .engine-card {
+            padding: 40px 32px;
+            border: 3px solid;
+            position: relative;
+        }
+
+        .engine-card:first-child {
+            border-color: var(--accent-cyan);
+        }
+
+        .engine-card:last-child {
+            border-color: var(--accent-amber);
+        }
+
+        .engine-card .engine-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+
+        .engine-card:first-child .engine-name { color: var(--accent-cyan); }
+        .engine-card:last-child .engine-name { color: var(--accent-amber); }
+
+        .engine-card .engine-subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .engine-card p {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .maks-features {
+                grid-template-columns: 1fr;
+            }
+            .fidelity-flow {
+                flex-direction: column;
+            }
+            .fidelity-stage:nth-child(2) {
+                border-left: 2px solid var(--zone-gradient);
+                border-right: 2px solid var(--zone-gradient);
+                border-top: none;
+                border-bottom: none;
+            }
+            .engine-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           Formula Section
+           ═══════════════════════════════════════ */
+        .formula-section {
+            padding: 100px 40px;
+            text-align: center;
+        }
+
+        .formula-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--accent-cyan);
+            letter-spacing: 4px;
+            margin: 40px 0;
+            padding: 40px;
+            border: 3px solid var(--accent-cyan);
+            display: inline-block;
+            position: relative;
+        }
+
+        .formula-display::before {
+            content: 'CORE FORMULA';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            font-size: 0.65rem;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .formula-caption {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════
+           CTA Section
+           ═══════════════════════════════════════ */
+        .cta {
+            padding: 120px 40px;
+            text-align: center;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════
+           Footer
+           ═══════════════════════════════════════ */
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border-primary);
+        }
+
+        footer p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        /* ═══════════════════════════════════════
+           Animations
+           ═══════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s ease-out;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════
+           Mobile
+           ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+
+            .nav-links a:not(.nav-cta) {
+                display: none;
+            }
+
+            .hero {
+                padding: 100px 24px 60px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+
+            .signal-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .zone-row {
+                flex-direction: column;
+            }
+
+            .zone-block:nth-child(2) {
+                border-left: 2px solid var(--zone-gradient);
+                border-right: 2px solid var(--zone-gradient);
+                border-top: none;
+                border-bottom: none;
+            }
+
+            .problem, .signals, .zones, .formula-section, .cta {
+                padding: 80px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/" class="nav-logo">EPISTEME <span>v1.0</span></a>
+        <div class="nav-links">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#signals">Signals</a>
+            <a href="#zones">Zones</a>
+            <a href="#memory">Memory</a>
+            <a href="/app" class="nav-cta">Open Workspace</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">Epistemic Uncertainty Quantification</div>
+        <h1>Know what your AI<br><span class="highlight">actually knows</span></h1>
+        <p class="hero-subtitle">
+            Every AI answer is a mixture of knowledge and guesswork. 
+            Episteme decomposes each claim into three measurable signals, 
+            classifies what to trust — and remembers what matters 
+            using biologically-inspired adaptive memory.
+        </p>
+        <div class="hero-actions">
+            <a href="/app" class="btn-primary">Open Workspace →</a>
+            <a href="#how-it-works" class="btn-secondary">How It Works</a>
+        </div>
+
+        <!-- Decorative pressure bar -->
+        <div class="hero-grid">
+            <div class="dot active"></div>
+            <div class="dot active"></div>
+            <div class="dot active"></div>
+            <div class="dot active"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot warn"></div>
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot warn"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot fault"></div>
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot warn"></div>
+            <div class="dot active"></div>
+        </div>
+    </section>
+
+    <!-- Problem -->
+    <section class="problem reveal" id="how-it-works">
+        <div class="problem-inner">
+            <div class="section-label">The Problem</div>
+            <h2>LLMs don't know what they don't know.<br>But now, you can.</h2>
+            <p>
+                Language models generate fluent, confident text — whether the underlying 
+                claim is well-supported or completely fabricated. Episteme runs every 
+                response through a three-axis epistemic analysis that separates 
+                genuine knowledge from structural hallucination. No fine-tuning required. 
+                Works with any model.
+            </p>
+        </div>
+    </section>
+
+    <!-- Three Signals -->
+    <section class="signals reveal" id="signals">
+        <div class="signals-header">
+            <div class="section-label">Three Independent Signals</div>
+            <h2>The Epistemic Decomposition</h2>
+        </div>
+
+        <div class="signal-cards">
+            <div class="signal-card">
+                <span class="signal-icon">H</span>
+                <h3>Entropy</h3>
+                <p>
+                    Measures how uncertain the model's token distribution is. 
+                    High entropy means the model is choosing between many 
+                    plausible alternatives — a sign of genuine uncertainty.
+                </p>
+                <div class="formula">H = −Σ p(t) log p(t)</div>
+            </div>
+
+            <div class="signal-card">
+                <span class="signal-icon">G</span>
+                <h3>Gradient</h3>
+                <p>
+                    Measures structural importance. If negating a claim causes 
+                    the entire answer to change, that claim is load-bearing. 
+                    High gradient + high entropy = dangerous dependency.
+                </p>
+                <div class="formula">G = d(A, A|¬claim)</div>
+            </div>
+
+            <div class="signal-card">
+                <span class="signal-icon">C</span>
+                <h3>Consistency</h3>
+                <p>
+                    Asks the same question multiple times. If the model gives 
+                    the same answer every time, it's consistent. If it contradicts 
+                    itself, the claim is epistemically fragile.
+                </p>
+                <div class="formula">C = mean(sim(sᵢ, sⱼ))</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Formula -->
+    <section class="formula-section reveal">
+        <div class="section-label" style="color: var(--accent-cyan);">Composite Score</div>
+        <h2>One number. Three signals. Complete picture.</h2>
+        <div class="formula-display">U = H × G × (1 − C)</div>
+        <p class="formula-caption">
+            Uncertainty is only high when all three conditions are met: 
+            the model is uncertain (H), the claim is structurally important (G), 
+            and the model contradicts itself (1−C). Any single safe signal 
+            zeroes out the alarm.
+        </p>
+    </section>
+
+    <!-- Zones -->
+    <section class="zones reveal" id="zones">
+        <div class="zones-header">
+            <div class="section-label">Zone Classification</div>
+            <h2>Every claim gets a verdict</h2>
+        </div>
+
+        <div class="zone-row">
+            <div class="zone-block">
+                <div class="zone-name">■ Solid</div>
+                <div class="zone-desc">Low uncertainty. The model is confident, consistent, and the claim isn't structurally fragile.</div>
+                <div class="zone-threshold">U ≤ 0.03</div>
+            </div>
+            <div class="zone-block">
+                <div class="zone-name">■ Gradient</div>
+                <div class="zone-desc">Moderate uncertainty. Some signals are elevated. Worth double-checking before acting on it.</div>
+                <div class="zone-threshold">0.03 < U < 0.08</div>
+            </div>
+            <div class="zone-block">
+                <div class="zone-name">■ Fault Line</div>
+                <div class="zone-desc">High uncertainty. The model is guessing, contradicting itself, or the claim is dangerously load-bearing.</div>
+                <div class="zone-threshold">U ≥ 0.08</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two Engines -->
+    <section class="engines reveal">
+        <div class="engines-header">
+            <div class="section-label">Architecture</div>
+            <h2>Two engines. One workspace.</h2>
+        </div>
+
+        <div class="engine-cards">
+            <div class="engine-card">
+                <div class="engine-name">KAIROS</div>
+                <div class="engine-subtitle">Epistemic Uncertainty Engine</div>
+                <p>
+                    Decomposes every AI response into atomic claims and scores each 
+                    one across three independent signals — entropy, gradient, and 
+                    consistency. Classifies claims into SOLID, GRADIENT, or FAULT LINE 
+                    zones so you know exactly what to trust.
+                </p>
+            </div>
+            <div class="engine-card">
+                <div class="engine-name">MAKS</div>
+                <div class="engine-subtitle">Adaptive Memory System</div>
+                <p>
+                    Manages long-term memory under token pressure using biologically-inspired 
+                    survival scoring. Memories degrade from FULL → PARTIAL → GHOST 
+                    fidelity. Ghost memories can be reconsolidated when contextually 
+                    relevant — just like human memory reconsolidation.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAKS Deep Dive -->
+    <section class="maks reveal" id="memory">
+        <div class="maks-header">
+            <div class="section-label">MAKS — Memory Architecture</div>
+            <h2>AI memory that forgets intelligently</h2>
+            <p>
+                Traditional chatbots dump old context. MAKS uses survival scoring 
+                to decide what to keep, what to compress, and what to archive — 
+                maintaining the most epistemically important memories under any 
+                token budget.
+            </p>
+        </div>
+
+        <div class="maks-features">
+            <div class="maks-card">
+                <span class="maks-icon">◈</span>
+                <h3>Survival Scoring</h3>
+                <p>
+                    Every memory gets a survival score based on recency, access frequency, 
+                    and epistemic entropy. Memories that are recent, frequently accessed, 
+                    and low-entropy survive longer. The formula mirrors biological memory 
+                    consolidation.
+                </p>
+            </div>
+            <div class="maks-card">
+                <span class="maks-icon">◇</span>
+                <h3>Ghost Reconsolidation</h3>
+                <p>
+                    When a memory's survival drops too low, it's archived as a "ghost" — 
+                    compressed but not deleted. If a new query is semantically similar 
+                    to a ghost, it gets reconsolidated back into active memory. Dead 
+                    knowledge can return.
+                </p>
+            </div>
+            <div class="maks-card">
+                <span class="maks-icon">▣</span>
+                <h3>Token Pressure</h3>
+                <p>
+                    MAKS operates under a fixed token budget. When capacity is exceeded, 
+                    the lowest-survival memories are evicted first. This creates natural 
+                    selection pressure — only the most relevant, certain memories persist.
+                </p>
+            </div>
+            <div class="maks-card">
+                <span class="maks-icon">▥</span>
+                <h3>Entropy-Penalized Retention</h3>
+                <p>
+                    Memories derived from FAULT LINE claims get a survival penalty. 
+                    The system preferentially forgets uncertain information and retains 
+                    knowledge it's confident about — epistemic quality shapes memory.
+                </p>
+            </div>
+        </div>
+
+        <!-- Fidelity Flow -->
+        <div class="fidelity-flow">
+            <div class="fidelity-stage">
+                <div class="stage-name">■ Full</div>
+                <div class="stage-desc">Complete text, full fidelity</div>
+            </div>
+            <div class="fidelity-stage">
+                <div class="stage-name">■ Partial</div>
+                <div class="stage-desc">Compressed, key facts retained</div>
+            </div>
+            <div class="fidelity-stage">
+                <div class="stage-name">■ Ghost</div>
+                <div class="stage-desc">Archived, awaiting reconsolidation</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta reveal">
+        <h2>See it in action.</h2>
+        <p>Ask any question. Watch every claim get decomposed and scored while memories adapt in real time.</p>
+        <a href="/app" class="btn-primary">Open Workspace →</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>EPISTEME — Powered by KAIROS epistemic engine & MAKS adaptive memory</p>
+    </footer>
+
+    <!-- Scroll reveal script -->
+    <script>
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        reveals.forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

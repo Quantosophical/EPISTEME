@@ -1,0 +1,19 @@
+# ═══════════════════════════════════════════════
+#  Episteme — Docker Compose
+# ═══════════════════════════════════════════════
+#  Run with: docker compose up --build
+# ═══════════════════════════════════════════════
+
+services:
+  episteme:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - episteme-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  episteme-data:

@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Episteme — Unified AI Epistemic Workspace</title>
+    <!-- Saturated, technical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0A0F1E; /* Deep dark space navy */
+            --card-color: #121829; /* Structured navy */
+            --border-color: #000000; /* Brutalist thick black borders */
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #475569;
+            --accent-gold: #C9A84C; /* MAKS gold */
+            
+            --zone-solid: #10B981; /* Saturated green */
+            --zone-gradient: #F59E0B; /* Saturated amber */
+            --zone-fault: #EF4444; /* Saturated red */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            
+            /* Saturated Brutalist Dot Grid */
+            background-image: radial-gradient(#000000 2px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, .font-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation */
+        header {
+            border-bottom: 4px solid var(--border-color);
+            padding: 16px 24px;
+            background-color: var(--bg-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        header .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .logo-symbol {
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-gold);
+            border: 3px solid #000;
+            border-radius: 4px;
+            display: inline-block;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .logo-text {
+            background: linear-gradient(to right, #FFFFFF, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Neo-brutalist Navigation Tab Group */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background-color: var(--card-color);
+            border: 3px solid #000;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .tab-btn.active {
+            color: #000000;
+            background-color: var(--accent-gold);
+            box-shadow: 2px 2px 0px #000;
+            transform: translate(2px, 2px);
+        }
+
+        .btn-brutalist {
+            background-color: var(--accent-gold);
+            color: #000000;
+            border: 3px solid #000;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-brutalist:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .btn-brutalist:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+        /* Workspace Grid Layout */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 25% 50% 25%;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 78px);
+            overflow: hidden;
+        }
+
+        /* Panel Common Styles */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            border-right: 4px solid var(--border-color);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 4px solid var(--border-color);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-primary);
+            background-color: var(--card-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* Left Panel: Query Panel */
+        .query-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .query-textarea {
+            width: 100%;
+            height: 180px;
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-radius: 6px;
+            color: var(--text-primary);
+            padding: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s ease;
+        }
+
+        .query-textarea:focus {
+            border-color: var(--accent-gold);
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px #000;
+        }
+
+        .instrument-meta {
+            border: 3px solid #000;
+            background-color: var(--card-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+        }
+
+        .meta-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .meta-label {
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-value {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Center Panel: The Epistemic Field */
+        .epistemic-header {
+            margin-bottom: 24px;
+        }
+
+        .headline-row {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            gap: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .headline-item span {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pressure-bar-container {
+            width: 100%;
+            height: 16px;
+            border-radius: 4px;
+            background: linear-gradient(to right, var(--zone-solid), var(--zone-gradient), var(--zone-fault));
+            position: relative;
+            margin-bottom: 16px;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .pressure-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid #000000;
+            position: absolute;
+            top: -2px;
+            transform: translateX(-50%);
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
+            transition: all 0.1s ease;
+        }
+
+        .pressure-dot:hover {
+            transform: translateX(-50%) scale(1.3);
+        }
+
+        /* Claim Rows Terrain */
+        .claims-terrain {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .claim-row {
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-radius: 6px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.15s ease-out;
+            position: relative;
+        }
+
+        .claim-row.solid { box-shadow: 4px 4px 0px var(--zone-solid); }
+        .claim-row.gradient { box-shadow: 4px 4px 0px var(--zone-gradient); }
+        .claim-row.fault { 
+            box-shadow: 4px 4px 0px var(--zone-fault); 
+            animation: pulse-red-shadow 2s infinite;
+        }
+
+        @keyframes pulse-red-shadow {
+            0% { box-shadow: 4px 4px 0px var(--zone-fault); }
+            50% { box-shadow: 6px 6px 0px var(--zone-fault); }
+            100% { box-shadow: 4px 4px 0px var(--zone-fault); }
+        }
+
+        .claim-row:hover {
+            transform: translate(-2px, -2px);
+        }
+        .claim-row.solid:hover { box-shadow: 6px 6px 0px var(--zone-solid); }
+        .claim-row.gradient:hover { box-shadow: 6px 6px 0px var(--zone-gradient); }
+        .claim-row.fault:hover { box-shadow: 6px 6px 0px var(--zone-fault); }
+
+        .claim-row-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .zone-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #000000;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+
+        .zone-dot.solid { background-color: var(--zone-solid); }
+        .zone-dot.gradient { background-color: var(--zone-gradient); }
+        .zone-dot.fault { 
+            background-color: var(--zone-fault); 
+            animation: pulse-dot-scale 1.5s infinite;
+        }
+
+        @keyframes pulse-dot-scale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .claim-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Component Scores Row */
+        .component-scores {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            border-top: 2px solid #000000;
+            padding-top: 12px;
+            margin-top: 6px;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #0c101d;
+            border: 1px solid #000000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            box-shadow: 1.5px 1.5px 0px #000;
+        }
+
+        .score-label {
+            color: var(--accent-gold);
+            font-weight: 800;
+        }
+
+        .score-bar {
+            color: var(--text-muted);
+            letter-spacing: -1px;
+            font-weight: 800;
+        }
+
+        .score-val {
+            color: var(--text-primary);
+            font-weight: 800;
+        }
+
+        /* Right Panel: Memory Lens */
+        .memory-lens-section {
+            margin-bottom: 28px;
+        }
+
+        .memory-zone-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #000;
+        }
+
+        .memory-lens-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .memory-lens-item {
+            border: 3px solid #000000;
+            background-color: var(--card-color);
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+            box-shadow: 4px 4px 0px var(--accent-gold);
+        }
+
+        .memory-lens-item:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px var(--accent-gold);
+        }
+
+        .memory-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .memory-symbol {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .memory-symbol-dot {
+            font-size: 1.1em;
+        }
+
+        .memory-survival {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .memory-preview {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .memory-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .memory-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .memory-action-btn {
+            background-color: var(--bg-color);
+            border: 1.5px solid #000;
+            color: var(--accent-gold);
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 3px;
+            box-shadow: 1px 1px 0px #000;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .memory-action-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .memory-action-btn.evict {
+            color: var(--zone-fault);
+        }
+
+        /* Connection Alert Notification inside Memory Lens */
+        .connection-alert {
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 4px 4px 0px var(--zone-fault);
+        }
+
+        .connection-alert-title {
+            color: var(--zone-fault);
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .connection-btn {
+            align-self: flex-start;
+            background-color: var(--zone-fault);
+            color: #ffffff;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .connection-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        /* Drawer Overlay */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            bottom: 0;
+            width: 450px;
+            background-color: var(--card-color);
+            border-left: 5px solid #000000;
+            z-index: 101;
+            padding: 30px;
+            box-shadow: -10px 0px 0px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+
+        .drawer.active {
+            right: 0;
+        }
+
+        .drawer-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-title-tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .drawer-close:hover {
+            color: var(--text-primary);
+        }
+
+        .drawer-claim-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text-primary);
+            border-left: 5px solid var(--accent-gold);
+            padding-left: 18px;
+        }
+
+        .drawer-section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .drawer-explanation {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .drawer-actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-top: 3px solid #000;
+            padding-top: 24px;
+        }
+
+        /* Session Map View styling */
+        .session-map-view {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        .map-node {
+            border: 3px solid #000000;
+            background-color: var(--card-color);
+            border-radius: 6px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .map-node-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 6px;
+        }
+
+        .map-node-query {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .map-claims-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-claim-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Verification Queue styling */
+        .queue-view {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .queue-item {
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-radius: 6px;
+            padding: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 4px 4px 0px var(--zone-fault);
+        }
+
+        .queue-item-details {
+            flex: 1;
+        }
+
+        .queue-item-claim {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .queue-item-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        /* Memory Manager View styling */
+        .manager-view {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .manager-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .manager-section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #000;
+        }
+
+        .manager-card {
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .manager-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .manager-card-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .manager-card-text {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+        }
+
+        .manager-card-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            border-top: 2px solid #000;
+            padding-top: 10px;
+            align-items: center;
+        }
+
+        /* Early Access Signup Section */
+        .landing-signup-section {
+            border-top: 4px solid var(--border-color);
+            background-color: var(--card-color);
+            padding: 100px 24px;
+            text-align: center;
+        }
+
+        .signup-inner {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .signup-inner h2 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .signup-inner p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+        }
+
+        .signup-form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .signup-input {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 3px solid #000;
+            border-radius: 4px;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .signup-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .signup-success-msg {
+            color: var(--zone-solid);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 16px;
+            display: none;
+        }
+
+        /* Progress live dots during drawing */
+        .progress-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .progress-dot {
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: pulse-dot 1.2s infinite ease-in-out;
+        }
+
+        .progress-dot:nth-child(2) { animation-delay: 0.2s; }
+        .progress-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(0.8); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Toast message styles */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 200;
+        }
+
+        .toast {
+            background-color: var(--card-color);
+            border: 3px solid #000000;
+            border-left: 8px solid var(--accent-gold);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 4px;
+            box-shadow: 6px 6px 0px #000000;
+            font-size: 0.85rem;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 360px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Streaming claim slide-in animation */
+        .claim-row.streaming-in {
+            animation: claim-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes claim-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Answer text display */
+        .answer-display {
+            background-color: var(--card-color);
+            border: 3px solid #000;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 4px 4px 0px var(--accent-gold);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .answer-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .scanning-indicator {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            padding: 14px;
+            border: 2px dashed rgba(201, 168, 76, 0.3);
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Cancel analysis button */
+        .cancel-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--zone-fault);
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--zone-fault);
+            border-radius: 4px;
+            padding: 6px 14px;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: all 0.15s ease;
+        }
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+            box-shadow: 2px 2px 0px var(--zone-fault);
+        }
+
+        /* ═══════════════════════════════════════
+           Mobile Responsive Layout
+           ═══════════════════════════════════════ */
+
+        @media (max-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .workspace-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+
+            .header-inner nav {
+                gap: 8px;
+            }
+
+            .header-inner nav button {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+
+            .panel {
+                min-height: auto;
+            }
+
+            .panel-header {
+                font-size: 0.85rem;
+                padding: 10px 14px;
+            }
+
+            .panel-content {
+                padding: 12px;
+            }
+
+            .headline-row {
+                flex-wrap: wrap;
+                gap: 6px;
+                font-size: 0.75rem;
+            }
+
+            .claim-row {
+                padding: 10px 12px;
+            }
+
+            .component-scores {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .score-bar {
+                display: none; /* Hide block bars on mobile for space */
+            }
+
+            .answer-display {
+                padding: 14px;
+                font-size: 0.88rem;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.1rem;
+            }
+
+            .drawer {
+                width: 100% !important;
+            }
+
+            footer {
+                flex-direction: column;
+                text-align: center;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                background-size: 15px 15px;
+            }
+
+            .logo-text {
+                font-size: 1rem;
+            }
+
+            .claim-text {
+                font-size: 0.8rem;
+            }
+
+            .score-item {
+                padding: 3px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="header-inner">
+                <div class="logo">
+                    <span class="logo-symbol"></span>
+                    <span class="logo-text">Episteme</span>
+                </div>
+                
+                <nav class="nav-tabs">
+                    <button class="tab-btn active" onclick="switchView('workspace')">Workspace</button>
+                    <button class="tab-btn" onclick="switchView('session-map')">Session Map</button>
+                    <button class="tab-btn" onclick="switchView('verification-queue')">Verification Queue</button>
+                    <button class="tab-btn" onclick="switchView('memory-manager')">Memory Manager</button>
+                </nav>
+
+                <div>
+                    <a href="#access" class="btn-brutalist">Secure Access</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main style="flex: 1; display: flex; flex-direction: column;">
+            
+            <!-- View 1: Workspace -->
+            <div id="view-workspace" class="workspace-grid">
+                
+                <!-- Left Panel: Query Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        Query Panel
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary);">τ = 0.7</span>
+                    </div>
+                    <div class="panel-content">
+                        <form class="query-form" onsubmit="submitQuery(event)">
+                            <textarea class="query-textarea" id="query-input" placeholder="Type your query to interrogate content..." required></textarea>
+                            <button type="submit" class="btn-brutalist" id="query-submit-btn" style="width: 100%; display: flex; justify-content: center; gap: 8px;">
+                                Interrogate Content
+                            </button>
+                        </form>
+
+                        <div class="instrument-meta">
+                            <div class="sidebar-title" style="font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 6px;">Config</div>
+                            
+                            <div class="meta-row">
+                                <span class="meta-label">Model</span>
+                                <span class="meta-value">meta/llama-3.2-3b-instruct</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Samples (N)</span>
+                                <span class="meta-value" id="samples-locked">5 runs</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Temperature</span>
+                                <span class="meta-value">0.70</span>
+                            </div>
+                            <div class="meta-row" id="progress-meta-row" style="display: none;">
+                                <span class="meta-label" style="color: var(--accent-gold);">Drawing Samples</span>
+                                <span class="meta-value">
+                                    <span class="progress-dots">
+                                        <span class="progress-dot"></span>
+                                        <span class="progress-dot"></span>
+                                        <span class="progress-dot"></span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Panel: The Epistemic Field -->
+                <div class="panel" style="background-color: rgba(10, 15, 30, 0.1);">
+                    <div class="panel-header">
+                        Epistemic Field
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary);" id="turn-indicator">Turn 0</span>
+                    </div>
+                    <div class="panel-content">
+                        
+                        <!-- Top metrics headline and pressure bar -->
+                        <div class="epistemic-header" id="field-metrics-header" style="display: none;">
+                            <div class="headline-row">
+                                <div class="headline-item"><span id="metric-solid">0</span> SOLID</div>
+                                <div>·</div>
+                                <div class="headline-item" style="color: var(--accent-amber);"><span id="metric-gradient">0</span> GRADIENT</div>
+                                <div>·</div>
+                                <div class="headline-item" style="color: var(--zone-fault);"><span id="metric-fault">0</span> FAULT LINE</div>
+                                <div>·</div>
+                                <div class="headline-item" style="color: var(--accent-gold);"><span id="metric-lift">∞</span> Lift</div>
+                            </div>
+                            
+                            <div class="pressure-bar-container" id="pressure-bar">
+                                <!-- Plotted dots are inserted dynamically here -->
+                            </div>
+                        </div>
+
+                        <!-- Terrain list of claims -->
+                        <div class="claims-terrain" id="claims-list">
+                            <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                                Submit a query to generate the epistemic terrain map.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Panel: Memory Lens -->
+                <div class="panel">
+                    <div class="panel-header">
+                        Memory Lens
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary);" id="eviction-threshold">θ = 0.1</span>
+                    </div>
+                    <div class="panel-content">
+                        
+                        <!-- Connection Alert Notifications -->
+                        <div id="memory-connection-alerts"></div>
+
+                        <!-- FULL MEMORIES -->
+                        <div class="memory-lens-section">
+                            <div class="memory-zone-title">Full Memory</div>
+                            <div class="memory-lens-list" id="mem-list-full">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No active Full memories stored.</div>
+                            </div>
+                        </div>
+
+                        <!-- PARTIAL MEMORIES -->
+                        <div class="memory-lens-section">
+                            <div class="memory-zone-title" style="color: #a855f7; border-bottom-color: #000;">Partial Memory</div>
+                            <div class="memory-lens-list" id="mem-list-partial">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No active Partial memories stored.</div>
+                            </div>
+                        </div>
+
+                        <!-- GHOST MEMORIES -->
+                        <div class="memory-lens-section">
+                            <div class="memory-zone-title" style="color: var(--text-muted); border-bottom-color: #000;">Ghost Memory</div>
+                            <div class="memory-lens-list" id="mem-list-ghost">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No archived Ghost memories.</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- View 2: Session Map -->
+            <div id="view-session-map" class="panel-content" style="display: none;">
+                <div class="session-map-view" id="session-map-container">
+                    <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                        No history found. Run turns in the workspace to draw the chronological map.
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 3: Verification Queue -->
+            <div id="view-verification-queue" class="panel-content" style="display: none;">
+                <div class="queue-view" id="queue-container">
+                    <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                        No critical claims currently flagged in queue.
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 4: Memory Manager -->
+            <div id="view-memory-manager" class="panel-content" style="display: none;">
+                <div class="manager-view">
+                    <div class="manager-grid">
+                        <div>
+                            <div class="manager-section-title">Active Memories</div>
+                            <div id="manager-active-list">
+                                <div style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">No active memories in store.</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="manager-section-title" style="color: var(--text-secondary);">Ghost Store Archive</div>
+                            <div id="manager-ghost-list">
+                                <div style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">Ghost archive empty.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-brutalist" onclick="resetSession()" style="margin-top: 40px; background-color: var(--zone-fault); color: #fff;">Reset System State</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Newsletter Signup Footer Section -->
+        <section id="access" class="landing-signup-section">
+            <div class="signup-inner">
+                <h2>Secure Early Access to Episteme</h2>
+                <p>Join the private beta to start building self-monitoring AI applications with QILA's epistemic memory layer.</p>
+                <form class="signup-form-row" onsubmit="submitSignup(event)">
+                    <input type="email" class="signup-input" placeholder="Work email address" required id="signup-email">
+                    <button type="submit" class="btn-brutalist">Get Access</button>
+                </form>
+                <div class="signup-success-msg" id="signup-success">
+                    ✓ Access request received. We will notify you when a console seat is ready for you.
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 20px; font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); border-top: 4px solid var(--border-color); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase;">
+            Episteme Workspace Console. Driven by Llama-3.2-3b-instruct NIM endpoint.
+        </footer>
+    </div>
+
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <!-- Drawer -->
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span class="drawer-title-tag" id="drawer-tag">CLAIM DETAILS</span>
+            <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+        </div>
+        <div class="drawer-claim-text" id="drawer-claim-text">
+            Claim text goes here.
+        </div>
+        <div>
+            <div class="drawer-section-title">Metrics</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background-color: #0c101d; padding: 16px; border: 3px solid #000000; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; box-shadow: 3px 3px 0px #000;">
+                <div>H_e_norm: <span id="drawer-val-h" style="color: var(--text-primary); font-weight: 800;">0.0000</span></div>
+                <div>Cons: <span id="drawer-val-cons" style="color: var(--text-primary); font-weight: 800;">0.0000</span></div>
+                <div>G_norm: <span id="drawer-val-g" style="color: var(--text-primary); font-weight: 800;">0.0000</span></div>
+                <div style="font-weight: 800; color: var(--accent-gold);">U (Uncertainty): <span id="drawer-val-u" style="color: var(--accent-gold);">0.0000</span></div>
+            </div>
+        </div>
+        <div>
+            <div class="drawer-section-title">Analysis Detail</div>
+            <div class="drawer-explanation" id="drawer-explanation">
+                Loading explanation...
+            </div>
+        </div>
+        <div>
+            <div class="drawer-section-title">Memory State</div>
+            <div class="drawer-explanation" id="drawer-memory-state" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background-color: #0c101d; padding: 12px; border: 2px solid #000; border-radius: 4px;">
+                No relevant memory found.
+            </div>
+        </div>
+        <div class="drawer-actions">
+            <button class="btn-brutalist" id="drawer-btn-verify" style="background-color: var(--zone-solid); color: #fff;">Mark Verified</button>
+            <button class="btn-brutalist" id="drawer-btn-wrong" style="background-color: var(--zone-fault); color: #fff;">Mark Wrong</button>
+            <button class="btn-brutalist" onclick="closeDrawer()" style="background-color: var(--card-color); color: #fff;">Skip</button>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <!-- JavaScript logic -->
+    <script>
+        let currentView = 'workspace';
+        let latestData = null;
+        let sessionMapData = [];
+        let verificationQueue = [];
+        let currentStreamClaims = []; // Claims from the current streaming session
+
+        // Poll status metrics every 4 seconds
+        setInterval(pollStatus, 4000);
+        pollStatus();
+
+        function switchView(viewName) {
+            currentView = viewName;
+            
+            // Toggle active tabs
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(viewName)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Toggle views visibility
+            document.getElementById('view-workspace').style.display = viewName === 'workspace' ? 'grid' : 'none';
+            document.getElementById('view-session-map').style.display = viewName === 'session-map' ? 'block' : 'none';
+            document.getElementById('view-verification-queue').style.display = viewName === 'verification-queue' ? 'block' : 'none';
+            document.getElementById('view-memory-manager').style.display = viewName === 'memory-manager' ? 'block' : 'none';
+
+            // Refresh view contents
+            if (viewName === 'session-map') {
+                renderSessionMap();
+            } else if (viewName === 'verification-queue') {
+                renderVerificationQueue();
+            } else if (viewName === 'memory-manager') {
+                renderMemoryManager();
+            }
+        }
+
+        function pollStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    latestData = data;
+                    updateMemoryLensUI(data);
+                })
+                .catch(err => console.error("Error polling status:", err));
+        }
+
+        function updateMemoryLensUI(data) {
+            const activeList = data.active_memories || [];
+            const ghostList = data.ghost_memories || [];
+
+            // Update header turn indicators
+            document.getElementById('turn-indicator').innerText = `Turn ${data.turn_count}`;
+
+            // Render Full & Partial Lists
+            const fullContainer = document.getElementById('mem-list-full');
+            const partialContainer = document.getElementById('mem-list-partial');
+            
+            const fullMemories = activeList.filter(m => m.fidelity === 'FULL');
+            const partialMemories = activeList.filter(m => m.fidelity === 'PARTIAL');
+
+            if (fullMemories.length === 0) {
+                fullContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No active Full memories stored.</div>`;
+            } else {
+                fullContainer.innerHTML = fullMemories.map(m => renderMemoryItem(m)).join('');
+            }
+
+            if (partialMemories.length === 0) {
+                partialContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No active Partial memories stored.</div>`;
+            } else {
+                partialContainer.innerHTML = partialMemories.map(m => renderMemoryItem(m)).join('');
+            }
+
+            // Render Ghost List
+            const ghostContainer = document.getElementById('mem-list-ghost');
+            if (ghostList.length === 0) {
+                ghostContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No archived Ghost memories.</div>`;
+            } else {
+                ghostContainer.innerHTML = ghostList.map(m => renderMemoryItem(m, true)).join('');
+            }
+
+            // Check connection alerts
+            checkConnectionAlerts(ghostList);
+        }
+
+        function renderMemoryItem(m, isGhost = false) {
+            const symbol = isGhost ? '○' : (m.fidelity === 'FULL' ? '●' : '◐');
+            const colorClass = isGhost ? 'var(--text-muted)' : (m.fidelity === 'FULL' ? 'var(--zone-solid)' : '#a855f7');
+            const ageText = isGhost ? 'Reconsolidation candidate' : `Fading — ${m.last_accessed.toFixed(0)}s ago`;
+
+            // Decay curves visual opacity
+            const opacity = isGhost ? 0.65 : Math.max(0.5, m.survival_score);
+
+            return `
+                <div class="memory-lens-item" style="opacity: ${opacity};">
+                    <div class="memory-item-header">
+                        <span class="memory-symbol" style="color: ${colorClass};">
+                            <span class="memory-symbol-dot">${symbol}</span>
+                            ${m.id}
+                        </span>
+                        <span class="memory-survival">S = ${m.survival_score.toFixed(4)}</span>
+                    </div>
+                    <div class="memory-preview">${m.content_preview}...</div>
+                    <div class="memory-footer">
+                        <span>${ageText}</span>
+                        <div class="memory-actions">
+                            ${isGhost ? `<button class="memory-action-btn" onclick="manualReconsolidate('${m.id}')">Reconsolidate</button>` : `<button class="memory-action-btn" onclick="manualBoost('${m.id}')">Boost</button>`}
+                            <button class="memory-action-btn evict" onclick="manualEvict('${m.id}')">Evict</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function manualBoost(memId) {
+            showToast(`Memory ${memId} boosted back to maximum strength.`);
+        }
+
+        function manualEvict(memId) {
+            showToast(`Memory ${memId} manually evicted from store.`);
+        }
+
+        function manualReconsolidate(memId) {
+            showToast(`Memory ${memId} manually reconsolidated to active workspace.`);
+        }
+
+        function checkConnectionAlerts(ghostList) {
+            const alertsContainer = document.getElementById('memory-connection-alerts');
+            alertsContainer.innerHTML = '';
+            
+            if (ghostList.length > 0) {
+                const faultClaim = verificationQueue.find(q => q.zone === 'FAULT LINE' && q.status === 'Uncertain');
+                if (faultClaim) {
+                    const matchedGhost = ghostList[0];
+                    alertsContainer.innerHTML = `
+                        <div class="connection-alert">
+                            <div class="connection-alert-title">
+                                ⚠️ EPISTEMIC CRITICAL CONNECTION
+                            </div>
+                            <div>
+                                Claim "<em>${faultClaim.claim.substring(0, 35)}...</em>" matches ghost memory <strong>${matchedGhost.id}</strong>. Veracity may be compromised due to faded context.
+                            </div>
+                            <button class="connection-btn" onclick="manualReconsolidate('${matchedGhost.id}')">Reconsolidate ${matchedGhost.id}</button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function submitQuery(event) {
+            event.preventDefault();
+            const queryInput = document.getElementById('query-input');
+            const submitBtn = document.getElementById('query-submit-btn');
+            const progressRow = document.getElementById('progress-meta-row');
+
+            const queryText = queryInput.value.trim();
+            if (!queryText) return;
+
+            // Update UI to running state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Sampling LLM...</span>`;
+            progressRow.style.display = 'flex';
+            currentStreamClaims = [];
+
+            const claimsList = document.getElementById('claims-list');
+            const headerEl = document.getElementById('field-metrics-header');
+            headerEl.style.display = 'none';
+            claimsList.innerHTML = `
+                <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                    Sampling model responses...
+                </div>
+            `;
+
+            // PHASE 1 — Get instant answer from /chat
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: queryText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                queryInput.value = '';
+                latestData = data;
+
+                // Handle reconsolidations toast alerts
+                if (data.reconsolidated && data.reconsolidated.length > 0) {
+                    data.reconsolidated.forEach(memId => showReconsolidationToast(memId));
+                }
+
+                // Show the answer immediately
+                renderAnswerDisplay(data.answer);
+                document.getElementById('turn-indicator').innerText = `Turn ${data.turn}`;
+
+                // Show scanning indicator
+                claimsList.innerHTML = `
+                    <div class="answer-display">
+                        <div class="answer-label">◈ Model Response</div>
+                        <div>${data.answer}</div>
+                    </div>
+                    <div class="scanning-indicator" id="scanning-status">
+                        ▸ Extracting claims and computing epistemic field...
+                    </div>
+                `;
+
+                // Update button to show Phase 2 with cancel option
+                submitBtn.innerHTML = `<span>Scanning Claims...</span>`;
+
+                // PHASE 2 — Stream KAIROS analysis via SSE
+                const evtSource = new EventSource('/chat/stream');
+                let sseLastActivity = Date.now();
+                let sseClosed = false;
+
+                // Timeout guard — cancel if no events for 90 seconds
+                const sseTimeoutId = setInterval(() => {
+                    if (sseClosed) { clearInterval(sseTimeoutId); return; }
+                    if (Date.now() - sseLastActivity > 90000) {
+                        clearInterval(sseTimeoutId);
+                        evtSource.close();
+                        sseClosed = true;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `Interrogate Content`;
+                        progressRow.style.display = 'none';
+                        const scanStatus = document.getElementById('scanning-status');
+                        if (scanStatus) {
+                            scanStatus.innerHTML = '▸ Analysis timed out. The answer above is still valid — epistemic scoring was interrupted.';
+                            scanStatus.style.color = 'var(--zone-gradient)';
+                        }
+                        showToast('Analysis timed out. Answer is still valid.');
+                    }
+                }, 5000);
+
+                // Cancel analysis function
+                window._cancelCurrentAnalysis = function() {
+                    clearInterval(sseTimeoutId);
+                    evtSource.close();
+                    sseClosed = true;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `Interrogate Content`;
+                    progressRow.style.display = 'none';
+                    const scanStatus = document.getElementById('scanning-status');
+                    if (scanStatus) {
+                        scanStatus.innerHTML = '▸ Analysis cancelled. Partial results shown above.';
+                        scanStatus.style.color = 'var(--text-secondary)';
+                    }
+                    showToast('Analysis cancelled.');
+                };
+
+                // Add cancel button to scanning status
+                const scanEl = document.getElementById('scanning-status');
+                if (scanEl) {
+                    scanEl.innerHTML += ' <button class="cancel-btn" onclick="window._cancelCurrentAnalysis()">Cancel</button>';
+                }
+
+                evtSource.addEventListener('analysis_started', function(e) {
+                    sseLastActivity = Date.now();
+                    const evt = JSON.parse(e.data);
+                    const scanStatus = document.getElementById('scanning-status');
+                    if (scanStatus) {
+                        scanStatus.innerHTML = `▸ Found ${evt.total_claims} claims. Computing perturbation gradients...`;
+                    }
+                    // Show the metrics header with zero counts
+                    headerEl.style.display = 'block';
+                    document.getElementById('metric-solid').innerText = '0';
+                    document.getElementById('metric-gradient').innerText = '0';
+                    document.getElementById('metric-fault').innerText = '0';
+                    document.getElementById('metric-lift').innerText = '∞';
+                    document.getElementById('pressure-bar').innerHTML = '';
+                });
+
+                evtSource.addEventListener('gradients_ready', function(e) {
+                    sseLastActivity = Date.now();
+                    const scanStatus = document.getElementById('scanning-status');
+                    if (scanStatus) {
+                        scanStatus.innerHTML = `▸ Gradients computed. Scoring claims...`;
+                    }
+                });
+
+                evtSource.addEventListener('claim', function(e) {
+                    sseLastActivity = Date.now();
+                    const claim = JSON.parse(e.data);
+                    currentStreamClaims.push(claim);
+                    
+                    // Remove scanning indicator on first claim
+                    const scanStatus = document.getElementById('scanning-status');
+                    if (scanStatus) scanStatus.remove();
+
+                    // Render this claim row with animation
+                    renderStreamingClaim(claim, claim.index);
+
+                    // Update pressure bar dot
+                    addPressureDot(claim, claim.index);
+
+                    // Update headline counters
+                    updateStreamingMetrics();
+                });
+
+                evtSource.addEventListener('complete', function(e) {
+                    clearInterval(sseTimeoutId);
+                    sseClosed = true;
+                    evtSource.close();
+                    const evt = JSON.parse(e.data);
+
+                    // Re-enable submit
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `Interrogate Content`;
+                    progressRow.style.display = 'none';
+
+                    // Store final kairos_field on latestData for drawer access
+                    if (latestData) {
+                        latestData.kairos_field = evt.kairos_field || currentStreamClaims.map(c => ({
+                            claim: c.claim, H_e_norm: c.H_e_norm, G_norm: c.G_norm,
+                            Cons: c.Cons, U: c.U, zone: c.zone
+                        }));
+                    }
+
+                    // Add to session map and verification queue
+                    addTurnToSessionMap(queryText, {
+                        turn: latestData?.turn || 0,
+                        answer: latestData?.answer || '',
+                        kairos_field: latestData?.kairos_field || []
+                    });
+                    pollStatus();
+
+                    if (evt.total_claims === 0) {
+                        const scanStatus = document.getElementById('scanning-status');
+                        if (scanStatus) {
+                            scanStatus.innerHTML = '▸ No atomic claims extracted from response.';
+                        }
+                    }
+                });
+
+                evtSource.addEventListener('error', function(e) {
+                    const errData = e.data ? JSON.parse(e.data) : {};
+                    console.error('SSE Error:', errData);
+                    evtSource.close();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `Interrogate Content`;
+                    progressRow.style.display = 'none';
+                    const scanStatus = document.getElementById('scanning-status');
+                    if (scanStatus) {
+                        scanStatus.innerHTML = `▸ Analysis error: ${errData.message || 'Connection lost'}`;
+                        scanStatus.style.color = 'var(--zone-fault)';
+                    }
+                });
+
+                evtSource.onerror = function() {
+                    if (sseClosed) return; // Already handled by complete/cancel
+                    clearInterval(sseTimeoutId);
+                    sseClosed = true;
+                    evtSource.close();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `Interrogate Content`;
+                    progressRow.style.display = 'none';
+                };
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `Interrogate Content`;
+                progressRow.style.display = 'none';
+                claimsList.innerHTML = `<div style="color: var(--zone-fault); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;">Error: Failed to communicate with Episteme backend.</div>`;
+                console.error("Error submitting query:", err);
+            });
+        }
+
+        function renderAnswerDisplay(answerText) {
+            // This is called immediately after Phase 1 returns
+            // The answer is shown inside the claims list area
+        }
+
+        function renderStreamingClaim(claim, idx) {
+            const listEl = document.getElementById('claims-list');
+            const zoneClass = claim.zone === 'SOLID' ? 'solid' : (claim.zone === 'GRADIENT' ? 'gradient' : 'fault');
+
+            // Build score bars
+            const hBlocks = Math.round(claim.H_e_norm * 10);
+            const gBlocks = Math.round(claim.G_norm * 10);
+            const cBlocks = Math.round(claim.Cons * 10);
+
+            const hBar = "█".repeat(hBlocks) + "░".repeat(10 - hBlocks);
+            const gBar = "█".repeat(gBlocks) + "░".repeat(10 - gBlocks);
+            const cBar = "█".repeat(cBlocks) + "░".repeat(10 - cBlocks);
+
+            const claimHTML = `
+                <div class="claim-row ${zoneClass} streaming-in" id="claim-row-${idx}" onclick="openClaimDetailsByIndex(${idx})">
+                    <div class="claim-row-header">
+                        <span class="zone-dot ${zoneClass}"></span>
+                        <span class="claim-text">${claim.claim}</span>
+                    </div>
+                    <div class="component-scores">
+                        <div class="score-item">
+                            <span class="score-label">H</span>
+                            <span class="score-bar">${hBar}</span>
+                            <span class="score-val">${claim.H_e_norm.toFixed(3)}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">G</span>
+                            <span class="score-bar">${gBar}</span>
+                            <span class="score-val">${claim.G_norm.toFixed(3)}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">C</span>
+                            <span class="score-bar">${cBar}</span>
+                            <span class="score-val">${claim.Cons.toFixed(3)}</span>
+                        </div>
+                        <div class="score-item" style="margin-left: auto; background-color: rgba(201, 168, 76, 0.1); border-color: var(--accent-gold);">
+                            <span class="score-label" style="color: var(--accent-gold);">U</span>
+                            <span class="score-val" style="color: var(--accent-gold); font-size: 0.9em;">${claim.U.toFixed(3)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            listEl.insertAdjacentHTML('beforeend', claimHTML);
+        }
+
+        function addPressureDot(claim, idx) {
+            const pressureBar = document.getElementById('pressure-bar');
+            const percentage = Math.min(100, Math.max(0, claim.U * 100));
+            const color = claim.zone === 'SOLID' ? 'var(--zone-solid)' : (claim.zone === 'GRADIENT' ? 'var(--zone-gradient)' : 'var(--zone-fault)');
+            
+            const dotHTML = `
+                <div class="pressure-dot" 
+                     style="left: ${percentage}%; background-color: ${color}; animation: claim-slide-in 0.3s ease-out forwards;" 
+                     title="${claim.claim} (U=${claim.U.toFixed(4)})"
+                     onclick="openClaimDetailsByIndex(${idx})"
+                     onmouseover="highlightClaimRow(${idx})"
+                     onmouseout="clearClaimRowHighlights()">
+                </div>
+            `;
+            pressureBar.insertAdjacentHTML('beforeend', dotHTML);
+        }
+
+        function updateStreamingMetrics() {
+            const solidCount = currentStreamClaims.filter(c => c.zone === 'SOLID').length;
+            const gradientCount = currentStreamClaims.filter(c => c.zone === 'GRADIENT').length;
+            const faultCount = currentStreamClaims.filter(c => c.zone === 'FAULT LINE').length;
+
+            document.getElementById('metric-solid').innerText = solidCount;
+            document.getElementById('metric-gradient').innerText = gradientCount;
+            document.getElementById('metric-fault').innerText = faultCount;
+
+            // Calculate Lift
+            const solidCons = currentStreamClaims.filter(c => c.zone === 'SOLID').map(c => c.Cons);
+            const faultCons = currentStreamClaims.filter(c => c.zone === 'FAULT LINE').map(c => c.Cons);
+            
+            let liftStr = "∞";
+            if (faultCount > 0 && solidCount > 0) {
+                const avgSolid = solidCons.reduce((a, b) => a + b, 0) / solidCount;
+                const avgFault = faultCons.reduce((a, b) => a + b, 0) / faultCount;
+                liftStr = (avgSolid / (avgFault || 0.001)).toFixed(2);
+            }
+            document.getElementById('metric-lift').innerText = liftStr;
+        }
+
+        function renderEpistemicField(data) {
+            // Legacy function kept for session map replay
+            const claims = data.kairos_field || [];
+            const headerEl = document.getElementById('field-metrics-header');
+            const pressureBar = document.getElementById('pressure-bar');
+            const listEl = document.getElementById('claims-list');
+
+            if (claims.length === 0) {
+                headerEl.style.display = 'none';
+                listEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">No atomic claims extracted from response.</div>`;
+                return;
+            }
+
+            // Calculate zone stats
+            const solidCount = claims.filter(c => c.zone === 'SOLID').length;
+            const gradientCount = claims.filter(c => c.zone === 'GRADIENT').length;
+            const faultCount = claims.filter(c => c.zone === 'FAULT LINE').length;
+            
+            // Calculate Lift
+            const solidCons = claims.filter(c => c.zone === 'SOLID').map(c => c.Cons);
+            const faultCons = claims.filter(c => c.zone === 'FAULT LINE').map(c => c.Cons);
+            
+            let liftStr = "∞";
+            if (faultCount > 0 && solidCount > 0) {
+                const avgSolid = solidCons.reduce((a, b) => a + b, 0) / solidCount;
+                const avgFault = faultCons.reduce((a, b) => a + b, 0) / faultCount;
+                liftStr = (avgSolid / (avgFault || 0.001)).toFixed(2);
+            }
+
+            document.getElementById('metric-solid').innerText = solidCount;
+            document.getElementById('metric-gradient').innerText = gradientCount;
+            document.getElementById('metric-fault').innerText = faultCount;
+            document.getElementById('metric-lift').innerText = liftStr;
+
+            headerEl.style.display = 'block';
+
+            // Render Pressure dots on the bar
+            pressureBar.innerHTML = claims.map((c, idx) => {
+                const percentage = Math.min(100, Math.max(0, c.U * 100));
+                const color = c.zone === 'SOLID' ? 'var(--zone-solid)' : (c.zone === 'GRADIENT' ? 'var(--zone-gradient)' : 'var(--zone-fault)');
+                return `
+                    <div class="pressure-dot" 
+                         style="left: ${percentage}%; background-color: ${color};" 
+                         title="${c.claim} (U=${c.U.toFixed(4)})"
+                         onclick="openClaimDetailsByIndex(${idx})"
+                         onmouseover="highlightClaimRow(${idx})"
+                         onmouseout="clearClaimRowHighlights()">
+                    </div>
+                `;
+            }).join('');
+
+            // Render structured rows
+            listEl.innerHTML = claims.map((c, idx) => {
+                const zoneClass = c.zone === 'SOLID' ? 'solid' : (c.zone === 'GRADIENT' ? 'gradient' : 'fault');
+                const rowClass = c.zone === 'SOLID' ? 'solid' : (c.zone === 'GRADIENT' ? 'gradient' : 'fault');
+                
+                // Build score bars
+                const hBlocks = Math.round(c.H_e_norm * 10);
+                const gBlocks = Math.round(c.G_norm * 10);
+                const cBlocks = Math.round(c.Cons * 10);
+                
+                const hBar = "█".repeat(hBlocks) + "░".repeat(10 - hBlocks);
+                const gBar = "█".repeat(gBlocks) + "░".repeat(10 - gBlocks);
+                const cBar = "█".repeat(cBlocks) + "░".repeat(10 - cBlocks);
+
+                return `
+                    <div class="claim-row ${rowClass}" id="claim-row-${idx}" onclick="openClaimDetailsByIndex(${idx})">
+                        <div class="claim-row-header">
+                            <span class="zone-dot ${zoneClass}"></span>
+                            <span class="claim-text">${c.claim}</span>
+                        </div>
+                        <div class="component-scores">
+                            <div class="score-item">
+                                <span class="score-label">H</span>
+                                <span class="score-bar">${hBar}</span>
+                                <span class="score-val">${c.H_e_norm.toFixed(3)}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">G</span>
+                                <span class="score-bar">${gBar}</span>
+                                <span class="score-val">${c.G_norm.toFixed(3)}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">C</span>
+                                <span class="score-bar">${cBar}</span>
+                                <span class="score-val">${c.Cons.toFixed(3)}</span>
+                            </div>
+                            <div class="score-item" style="margin-left: auto; background-color: rgba(201, 168, 76, 0.1); border-color: var(--accent-gold);">
+                                <span class="score-label" style="color: var(--accent-gold);">U</span>
+                                <span class="score-val" style="color: var(--accent-gold); font-size: 0.9em;">${c.U.toFixed(3)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function highlightClaimRow(idx) {
+            const row = document.getElementById(`claim-row-${idx}`);
+            if (row) {
+                row.style.transform = 'translate(-4px, -4px)';
+                if (row.classList.contains('solid')) row.style.boxShadow = '8px 8px 0px var(--zone-solid)';
+                if (row.classList.contains('gradient')) row.style.boxShadow = '8px 8px 0px var(--zone-gradient)';
+                if (row.classList.contains('fault')) row.style.boxShadow = '8px 8px 0px var(--zone-fault)';
+            }
+        }
+
+        function clearClaimRowHighlights() {
+            const rows = document.querySelectorAll('.claim-row');
+            rows.forEach(row => {
+                row.style.transform = '';
+                row.style.boxShadow = '';
+            });
+        }
+
+        function addTurnToSessionMap(query, data) {
+            const turnData = {
+                turn: data.turn,
+                query: query,
+                answer: data.answer,
+                claims: data.kairos_field || []
+            };
+            sessionMapData.push(turnData);
+
+            turnData.claims.forEach(c => {
+                if (c.zone === 'FAULT LINE') {
+                    const exists = verificationQueue.some(q => q.claim === c.claim && q.query === query);
+                    if (!exists) {
+                        verificationQueue.push({
+                            claim: c.claim,
+                            zone: c.zone,
+                            U: c.U,
+                            H: c.H_e_norm,
+                            G: c.G_norm,
+                            Cons: c.Cons,
+                            query: query,
+                            status: 'Uncertain'
+                        });
+                    }
+                }
+            });
+        }
+
+        function openClaimDetailsByIndex(idx) {
+            // Check streaming claims first (available during live streaming), then latestData
+            let claim = null;
+            if (currentStreamClaims.length > idx) {
+                claim = currentStreamClaims[idx];
+            } else if (latestData && latestData.kairos_field && latestData.kairos_field[idx]) {
+                claim = latestData.kairos_field[idx];
+            }
+            if (!claim) return;
+            
+            const tag = document.getElementById('drawer-tag');
+            tag.innerText = `${claim.zone} CLAIM`;
+            tag.className = 'drawer-title-tag';
+            if (claim.zone === 'SOLID') {
+                tag.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                tag.style.color = 'var(--zone-solid)';
+                tag.style.borderColor = 'var(--zone-solid)';
+                tag.style.boxShadow = '2px 2px 0px var(--zone-solid)';
+            } else if (claim.zone === 'GRADIENT') {
+                tag.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+                tag.style.color = 'var(--accent-amber)';
+                tag.style.borderColor = 'var(--accent-amber)';
+                tag.style.boxShadow = '2px 2px 0px var(--accent-amber)';
+            } else {
+                tag.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                tag.style.color = 'var(--zone-fault)';
+                tag.style.borderColor = 'var(--zone-fault)';
+                tag.style.boxShadow = '2px 2px 0px var(--zone-fault)';
+            }
+
+            document.getElementById('drawer-claim-text').innerText = claim.claim;
+            document.getElementById('drawer-val-h').innerText = claim.H_e_norm.toFixed(4);
+            document.getElementById('drawer-val-g').innerText = claim.G_norm.toFixed(4);
+            document.getElementById('drawer-val-cons').innerText = claim.Cons.toFixed(4);
+            document.getElementById('drawer-val-u').innerText = claim.U.toFixed(4);
+
+            const agreedRuns = Math.round(claim.Cons * 5);
+            const divergedRuns = 5 - agreedRuns;
+            
+            let explanation = `The model agreed on this statement in **${agreedRuns}** of **5** independent runs. `;
+            if (divergedRuns > 0) {
+                explanation += `In **${divergedRuns}** runs, alternative answers diverged. `;
+            }
+            
+            if (claim.G_norm > 0.7) {
+                explanation += `<br><br><strong>Epistemic Warning:</strong> This claim is structurally load-bearing. Swapping it with counterfactual assumptions caused a major shift in subsequent deductions. `;
+            } else if (claim.G_norm > 0.3) {
+                explanation += `<br><br><strong>Epistemic Notice:</strong> This claim has moderate structural weight and localized downstream effects. `;
+            } else {
+                explanation += `<br><br><strong>Epistemic Note:</strong> This claim is structurally isolated; other statements do not heavily rely on its veracity. `;
+            }
+
+            if (claim.zone === 'FAULT LINE') {
+                explanation += `<br><br><span style="color: var(--zone-fault); font-weight: 700; text-transform: uppercase;">Combined Alert:</span> High entropy and structural weight indicate elevated error/hallucination risk.`;
+            }
+
+            document.getElementById('drawer-explanation').innerHTML = explanation;
+
+            let memoryStateStr = "No relevant faded memory found in archive.";
+            if (latestData && latestData.ghost_memories) {
+                const match = latestData.ghost_memories[0];
+                if (match) {
+                    memoryStateStr = `⚠️ ghost memory connection: context <strong>${match.id}</strong> ("${match.content_preview}...") has faded.`;
+                }
+            }
+            document.getElementById('drawer-memory-state').innerHTML = memoryStateStr;
+
+            document.getElementById('drawer-btn-verify').onclick = () => {
+                markQueueItem(claim.claim, 'Verified');
+                closeDrawer();
+            };
+            document.getElementById('drawer-btn-wrong').onclick = () => {
+                markQueueItem(claim.claim, 'Wrong');
+                closeDrawer();
+            };
+
+            document.getElementById('drawer-overlay').classList.add('active');
+            document.getElementById('drawer').classList.add('active');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('active');
+            document.getElementById('drawer').classList.remove('active');
+        }
+
+        function markQueueItem(claimText, status) {
+            const item = verificationQueue.find(q => q.claim === claimText);
+            if (item) {
+                item.status = status;
+                showToast(`Claim marked as ${status}.`);
+                renderVerificationQueue();
+            }
+        }
+
+        /* Render Session Map */
+        function renderSessionMap() {
+            const container = document.getElementById('session-map-container');
+            if (sessionMapData.length === 0) {
+                container.innerHTML = `
+                    <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                        No history found. Run turns in the workspace to draw the chronological map.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = sessionMapData.map((turn, tIdx) => {
+                const claimsHtml = turn.claims.map(c => {
+                    const dotColor = c.zone === 'SOLID' ? 'var(--zone-solid)' : (c.zone === 'GRADIENT' ? 'var(--zone-gradient)' : 'var(--zone-fault)');
+                    return `
+                        <div class="map-claim-item">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${dotColor}; border: 1.5px solid #000; box-shadow: 1.5px 1.5px 0px #000; display: inline-block;"></span>
+                            <span style="color: var(--accent-gold); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; width: 65px;">U=${c.U.toFixed(3)}</span>
+                            <span>${c.claim}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="map-node">
+                        <div class="map-node-header">
+                            <span>Turn ${turn.turn}</span>
+                            <span>${turn.claims.length} claims extracted</span>
+                        </div>
+                        <div class="map-node-query">Q: ${turn.query}</div>
+                        <div class="map-claims-list">
+                            ${claimsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* Render Verification Queue */
+        function renderVerificationQueue() {
+            const container = document.getElementById('queue-container');
+            if (verificationQueue.length === 0) {
+                container.innerHTML = `
+                    <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                        No critical claims currently flagged in queue.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = verificationQueue.map((item, idx) => {
+                let statusBadgeColor = 'var(--text-muted)';
+                if (item.status === 'Verified') statusBadgeColor = 'var(--zone-solid)';
+                if (item.status === 'Wrong') statusBadgeColor = 'var(--zone-fault)';
+
+                return `
+                    <div class="queue-item" style="box-shadow: 4px 4px 0px ${item.status === 'Uncertain' ? 'var(--zone-fault)' : statusBadgeColor}; border-left: 5px solid #000;">
+                        <div class="queue-item-details">
+                            <div class="queue-item-claim">${item.claim}</div>
+                            <div class="queue-item-meta">
+                                Query: "${item.query.substring(0, 40)}..." · U = ${item.U.toFixed(4)} · status: <span style="color: ${statusBadgeColor}; font-weight: bold; text-transform: uppercase;">${item.status}</span>
+                            </div>
+                        </div>
+                        <div class="queue-actions">
+                            <button class="queue-btn verify" onclick="markQueueItemByIndex(${idx}, 'Verified')">Verify</button>
+                            <button class="queue-btn wrong" onclick="markQueueItemByIndex(${idx}, 'Wrong')">Wrong</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function markQueueItemByIndex(idx, status) {
+            verificationQueue[idx].status = status;
+            showToast(`Claim marked as ${status}.`);
+            renderVerificationQueue();
+        }
+
+        /* Render Memory Manager */
+        function renderMemoryManager() {
+            const activeListContainer = document.getElementById('manager-active-list');
+            const ghostListContainer = document.getElementById('manager-ghost-list');
+
+            if (!latestData) return;
+
+            const activeList = latestData.active_memories || [];
+            const ghostList = latestData.ghost_memories || [];
+
+            if (activeList.length === 0) {
+                activeListContainer.innerHTML = `<div style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">No active memories in store.</div>`;
+            } else {
+                activeListContainer.innerHTML = activeList.map(m => `
+                    <div class="manager-card" style="box-shadow: 4px 4px 0px var(--zone-solid);">
+                        <div class="manager-card-header">
+                            <span class="manager-card-id" style="color: var(--zone-solid);">${m.id} (${m.fidelity})</span>
+                            <span class="mono" style="color: var(--accent-gold);">S = ${m.survival_score.toFixed(4)}</span>
+                        </div>
+                        <div class="manager-card-text">${m.content_preview}...</div>
+                        <div class="manager-card-stats">
+                            <span>Last accessed: ${m.last_accessed.toFixed(1)}s ago</span>
+                            <div class="manager-actions">
+                                <button class="memory-action-btn" onclick="manualBoost('${m.id}')">Boost</button>
+                                <button class="memory-action-btn evict" onclick="manualEvict('${m.id}')">Evict</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (ghostList.length === 0) {
+                ghostListContainer.innerHTML = `<div style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">Ghost archive empty.</div>`;
+            } else {
+                ghostListContainer.innerHTML = ghostList.map(m => `
+                    <div class="manager-card" style="box-shadow: 4px 4px 0px var(--text-muted);">
+                        <div class="manager-card-header">
+                            <span class="manager-card-id" style="color: var(--text-secondary);">${m.id} (GHOST)</span>
+                            <span class="mono" style="color: var(--accent-gold);">S = ${m.survival_score.toFixed(4)}</span>
+                        </div>
+                        <div class="manager-card-text">${m.content_preview}...</div>
+                        <div class="manager-card-stats">
+                            <span>Faded from workspace</span>
+                            <div class="manager-actions">
+                                <button class="memory-action-btn" onclick="manualReconsolidate('${m.id}')">Reconsolidate</button>
+                                <button class="memory-action-btn evict" onclick="manualEvict('${m.id}')">Evict</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        /* Reset workspace action */
+        function resetSession() {
+            if (confirm("Reset current Episteme workspace? All memory states and session statistics will be purged.")) {
+                fetch('/reset')
+                    .then(response => response.json())
+                    .then(data => {
+                        latestData = null;
+                        sessionMapData = [];
+                        verificationQueue = [];
+                        
+                        // Clear active view lists
+                        document.getElementById('claims-list').innerHTML = `
+                            <div style="color: var(--text-secondary); text-align: center; padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500;">
+                                Submit a query to generate the epistemic terrain map.
+                            </div>
+                        `;
+                        document.getElementById('field-metrics-header').style.display = 'none';
+
+                        pollStatus();
+                        showToast("Session reset successfully.");
+                    })
+                    .catch(err => console.error("Error resetting session:", err));
+            }
+        }
+
+        /* Toast & Alerts helper */
+        function showToast(message) {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.style.borderLeftColor = "var(--accent-gold)";
+            toast.innerHTML = `ℹ️ ${message}`;
+            container.appendChild(toast);
+            
+            // Trigger animation
+            toast.offsetHeight;
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showReconsolidationToast(memId) {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.innerHTML = `🔄 <strong>MAKS Reconsolidation:</strong> Memory <code>${memId}</code> retrieved and revived from Ghost archive.`;
+            container.appendChild(toast);
+            
+            // Trigger animation
+            toast.offsetHeight;
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function submitSignup(event) {
+            event.preventDefault();
+            const signupBtn = event.target.querySelector('button');
+            const emailInput = document.getElementById('signup-email');
+
+            signupBtn.disabled = true;
+            signupBtn.innerText = 'Requesting...';
+
+            setTimeout(() => {
+                signupBtn.style.display = 'none';
+                emailInput.style.display = 'none';
+                document.getElementById('signup-success').style.display = 'block';
+                showToast("Access requested successfully.");
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
